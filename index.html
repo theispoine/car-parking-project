@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+        body{
+    background-image: url('');
+    background-size: cover;
+    height: 100vh;
+    padding:0;
+    margin:0;
+    background-color: #5a5a7c;
+}
+main {
+    width: 50%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+table {
+    margin: 50px auto;
+}
+
+table, th, td {
+    border-collapse: collapse;
+    border: 1px solid #000;
+    border-radius :7px;   
+}
+
+th, td {
+    padding: 5px;
+}
+.button {
+    position: relative;
+    background-color: #9472ca;
+    border: none;
+    font-size: 28px;
+    color: #e2dede;
+    padding: 5px;
+    width: 200px;
+    text-align: center;
+    transition-duration: 1s;
+    text-decoration: none;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius :10px;
+  }
+  
+  .button:after {
+    content: "";
+    background: #bda2c0;
+    display: block;
+    position: absolute;
+    padding-top: 300%;
+    padding-left: 350%;
+    margin-left: -20px !important;
+    margin-top: -120%;
+    opacity: 0;
+    transition: all 0.8s
+  }
+  
+  .button:active:after {
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transition: 0s
+  }
+  input[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  input[type=submit] {
+    width: 100%;
+    background-color: #8de790;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: #45a049;
+  }
+  
+  div {
+    border-radius: 5px;
+    background-color: #caccf0;
+    padding: 20px;
+  }
+  #customers {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  #customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  #customers tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #customers tr:hover {background-color: #ddd;}
+  
+  #customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #812c2c;
+    color: white;
+    margin-bottom: 50px;
+    border-radius :7px;
+  }
+    </style>
+<head>    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21430070025 KADİR ÇİÇEK
+    </title>
+</head>
+<body>
+    <main>
+        <div>
+        <h2><label>PLAKAYI GİRİNİZ</label></h2>
+        <input type="text" id="name-input" placeholder="Lütfen Eklenecek Plakayı Giriniz">
+        <button class="button" id="add-name-btn">EKLE</button>
+        <br><br><br>
+        
+           <input type="text" placeholder="Aramak İstediğiniz Plakayı Yazınız" id="search-input">
+           <button class="button" id="search-btn">Arama Yap</button>        
+
+        <table  id="customers">
+            <thead>
+                <th>ID</th>
+                <th>PLAKA</th>
+                <th>Eklendiği Tarih</th>
+                <th>Ücret</th>
+                <th>Durumu</th>
+                <th>Çıkış Yap</th>
+                <th>Veriyi Düzenle</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+        <section hidden id="update-row">
+            <label>Yeni Plakayı Giriniz:</label>
+            <input type="text" id="update-name-input">
+            <button class="button" id="update-row-btn">Güncelle</button>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    fetch('http://localhost:5000/getAll')
+    .then(response => response.json())
+    .then(data => loadHTMLTable(data['data']));
+    
+});
+
+document.querySelector('table tbody').addEventListener('click', function(event) {
+    if (event.target.className === "delete-row-btn") {
+        deleteRowById(event.target.dataset.id);
+    }
+    if (event.target.className === "edit-row-btn") {
+        handleEditRow(event.target.dataset.id);
+    }
+});
+
+const updateBtn = document.querySelector('#update-row-btn');
+const searchBtn = document.querySelector('#search-btn');
+
+searchBtn.onclick = function() {
+    const searchValue = document.querySelector('#search-input').value;
+
+    fetch('http://localhost:5000/search/' + searchValue)
+    .then(response => response.json())
+    .then(data => loadHTMLTable(data['data']));
+}
+
+function deleteRowById(id) {
+    fetch('http://localhost:5000/delete/' + id, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+function deleteRowById2(id) {
+    fetch('http://localhost:5000/delete/' + id, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function handleEditRow(id) {
+    const updateSection = document.querySelector('#update-row');
+    updateSection.hidden = false;
+    document.querySelector('#update-name-input').dataset.id = id;
+}
+
+updateBtn.onclick = function() {
+    const updateNameInput = document.querySelector('#update-name-input');
+
+
+    console.log(updateNameInput);
+
+    fetch('http://localhost:5000/update', {
+        method: 'PATCH',
+        headers: {
+            'Content-type' : 'application/json'
+        },
+        body: JSON.stringify({
+            id: updateNameInput.dataset.id,
+            name: updateNameInput.value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+}
+
+
+const addBtn = document.querySelector('#add-name-btn');
+
+addBtn.onclick = function () {
+    const nameInput = document.querySelector('#name-input');
+    const name = nameInput.value;
+    nameInput.value = "";
+    fetch('http://localhost:5000/insert', {
+        headers: {
+            'Content-type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({ name : name})
+    })
+    .then(response => response.json())
+    .then(data => insertRowIntoTable(data['data']));
+    
+}
+
+function insertRowIntoTable(data) {
+    console.log(data);
+    const table = document.querySelector('table tbody');
+    const isTableData = table.querySelector('.no-data');
+
+    let tableHtml = "<tr>";
+
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            if (key === 'dateAdded') {
+                data[key] = new Date(data[key]).toLocaleString();
+            }
+            tableHtml += `<td>${data[key]}</td>`;
+        }
+    }
+
+    tableHtml += `<td><button class="delete-row-btn" data-id=${data.id}>Çıkış</td>`;
+    tableHtml += `<td><button class="edit-row-btn" data-id=${data.id}>Düzenle</td>`;
+    
+        
+
+    tableHtml += "</tr>";
+
+    if (isTableData) {
+        table.innerHTML = tableHtml;
+    } else {
+        const newRow = table.insertRow();
+        newRow.innerHTML = tableHtml;
+    }
+}
+
+function loadHTMLTable(data) {
+    const table = document.querySelector('table tbody');
+
+    if (data.length === 0) {
+        table.innerHTML = "<tr><td class='no-data' colspan='7'>Veri Yok</td></tr>";
+        return;
+    }
+
+    let tableHtml = "";
+
+    data.forEach(function ({id, name, date_added,price,durum}) {
+        tableHtml += "<tr>";
+        tableHtml += `<td>${id}</td>`;
+        tableHtml += `<td>${name}</td>`;
+        tableHtml += `<td>${date_added}</td>`;   
+        tableHtml += `<td>${price}</td>`;
+        tableHtml += `<td>${durum}</td>`;
+        tableHtml += `<td><button class="delete-row-btn" data-id=${id}>Çıkış</td>`;
+        tableHtml += `<td><button class="edit-row-btn" data-id=${id}>Düzenle</td>`;
+       
+        tableHtml += "</tr>";
+    });
+
+    table.innerHTML = tableHtml;
+}
+
+    </script>
+</body>
+</html>
